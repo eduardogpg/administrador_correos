@@ -1,0 +1,46 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col">
+        <h1>Listado de correos!</h1>
+        <a href="{% url 'mails:create' %}" class="btn btn-primary">Nuevo correo</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col">
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Título</th>
+                <th scope="col">Fecha de envío</th>
+                <th scope="col">Nº Leído</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+                {% for mail in object_list %}
+                    <tr>
+                        <td>{{ mail.id }}</td>
+                        <td>{{ mail.subject }}</td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <a href="{% url 'mails:detail' mail.id %}" class="btn btn-info">Ver</a>
+                            <a href="{% url 'mails:update' mail.id %}" class="btn btn-warning">Editar</a>
+
+                            <form action="{% url 'mails:delete' mail.id %}" class="d-inline" method="POST">
+                                {% csrf_token %}
+                                <input type="submit" value="Eliminar" class="btn btn-danger">
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+          </table>
+
+    </div>
+</div>
+{% endblock %}
