@@ -8,6 +8,8 @@ from django.shortcuts import redirect
 
 from django.shortcuts import get_object_or_404
 
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+
 from django.urls import reverse_lazy
 
 from django.template.loader import get_template
@@ -24,6 +26,8 @@ from django.views.generic.detail import DetailView
 from .models import Mail
 from users.models import User
 from user_mails.models import UserMail
+
+from django.contrib.sites.shortcuts import get_current_site
 
 from .forms import CreateMailForm
 
@@ -56,6 +60,10 @@ class MailDetailView(DetailView):
     model = Mail
     template_name = 'mails/detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context  
+
 def create_mail(subject, user, template_path='', context={}):
     template = get_template(template_path)
     content = template.render(context)
@@ -75,11 +83,21 @@ def send_async():
 
 def send(request, pk):
     mail = get_object_or_404(Mail, pk=pk)
+    token_generator = PasswordResetTokenGenerator()
+
+    url = reverse('footer')
+    domain = get_current_site(request)
 
     for user in User.objects.exclude(usermail__mail=mail).filter(newsletter=True):
-        user_mail = UserMail.objects.create(user=user, mail=mail)
+        
+        token = token_generator.make_token(user)
+        user_mail = UserMail.objects.create(user=user, mail=mail, token=token)
 
-        context = { 'mail':mail, 'user':user }
+        context = { 'mail':mail, 
+                    'user':user, 
+                    'token': token, 
+                    'domain': domain.domain, 
+                    'url': url }
         
         email = create_mail(mail.subject, user, 'mails/base/base.html', context)
         email.send(fail_silently=False)
@@ -88,3 +106,19 @@ def send(request, pk):
         user_mail.save()
 
     return redirect('mails:detail', mail.id)
+
+def admin(request, pk):
+    mail = get_object_or_404(Mail, pk=pk)
+    
+    context = { 'mail': mail}
+    
+    context['users'] = UserMail.objects.filter(mail=mail).count()
+    context['read_count'] = UserMail.objects.filter(mail=mail).filter(read=True).count()
+
+    user_mail = UserMail.objects.filter(mail=mail).last()
+    if user_mail:
+        context['last_send_at'] = user_mail.sent_at
+
+    context['user_mails'] = UserMail.objects.filter(mail=mail)
+
+    return render(request, 'mails/admin.html', context)

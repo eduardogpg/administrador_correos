@@ -41,7 +41,10 @@ INSTALLED_APPS = [
     'users',
     'mails',
     'user_mails',
+    'django_inlinecss',
 ]
+
+INSTALLED_APPS += ('naomi',)
 
 AUTH_USER_MODEL = 'users.user'
 
@@ -125,8 +128,20 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'eduardo78d@gmail.com'
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
+
+IMAGE_DIR = BASE_DIR / 'static' / 'images'
+
+if DEBUG:
+    EMAIL_BACKEND = "naomi.mail.backends.naomi.NaomiBackend"
+    EMAIL_FILE_PATH = "/Users/eduardo/Documents/admin_mails/admin_mails/tmp"

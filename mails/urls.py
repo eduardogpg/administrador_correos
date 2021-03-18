@@ -1,6 +1,7 @@
 from django.urls import path
 
 from .views import send
+from .views import admin
 
 from .views import MailListView
 from .views import MailCreateView
@@ -13,10 +14,12 @@ app_name = 'mails'
 urlpatterns = [
     path('', MailListView.as_view(), name='list'),
     path('create', MailCreateView.as_view(), name='create'),
-    path('detail/<int:pk>', MailDetailView.as_view(), name='detail'),
     
-    path('update/<int:pk>', MailUpdateView.as_view(), name='update'),
-    path('delete/<int:pk>', MailDeleteView.as_view(), name='delete'),
+    path('<int:pk>/detail', MailDetailView.as_view(), name='detail'),
+    path('<int:pk>/update', MailUpdateView.as_view(), name='update'),
+    path('<int:pk>/delete', MailDeleteView.as_view(), name='delete'),
 
-    path('send/<int:pk>', send, name='send')
+    path('<int:pk>/admin', admin, name='admin'),
+
+    path('<int:pk>/send', send, name='send')
 ]

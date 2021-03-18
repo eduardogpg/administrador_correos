@@ -4,15 +4,20 @@
 <div class="row">
     <div class="col">
         <h1>{{ object.subject }}</h1>
-        <a href="{% url 'mails:send' object.id %}" class="btn btn-primary">Envíar correo</a>
+        
+        <div class="mt-2">
+            <a href="{% url 'mails:send' object.id %}" class="btn btn-primary">Envíar correo</a>
+        </div>
+        
     </div>
 </div>
 <hr>
 <div class="row">
     <div class="col">
         <p>
-            {{ object.content }}
+            {{ object.content | safe }}
         </p>
     </div>
 </div>
+
 {% endblock %}

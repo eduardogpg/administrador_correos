@@ -1,12 +1,19 @@
+{% load inlinecss %}
+{% inlinecss "css/style.css" %}
 <html>
     <body>
         <h1>Hola {{ user.username }}</h1>
         <div>
             <section>
-                <p>
-                    {{ mail.content }}
-                </p>
+                    {{ mail.content | safe }}
             </section>
+        </div>
+        <div>
+            <footer>
+                <img src="http://{{ domain }}{{ url }}?token={{ token }}" width="100" height="75">
+            </footer>
         </div>
     </body>
 </html>
+{% endinlinecss %}
+
